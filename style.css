@@ -1,0 +1,215 @@
+@font-face {
+  font-family: 'Montserrat';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('assets/fonts/Montserrat-Medium.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Montserrat';
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url('assets/fonts/Montserrat-Black.woff2') format('woff2'),
+       url('assets/fonts/Montserrat-Black.ttf') format('truetype');
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background-color: #000000;
+  color: #7A7A7A;
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Main Hero & Links Section */
+.instabio-section {
+  position: relative;
+  width: 100%;
+  background-color: #000000;
+  background-image: url('assets/img/Banner-01-Desktop-1.webp');
+  background-position: top center;
+  background-repeat: no-repeat;
+  background-size: auto;
+  transition: background 0.3s, border 0.3s, border-radius 0.3s, box-shadow 0.3s;
+}
+
+@media (min-width: 1025px) {
+  .instabio-section {
+    background-attachment: fixed;
+  }
+}
+
+.instabio-overlay {
+  position: absolute;
+  inset: 0;
+  background-color: #000000;
+  opacity: 0.85;
+  pointer-events: none;
+  transition: background 0.3s, border-radius 0.3s, opacity 0.3s;
+}
+
+.instabio-container {
+  position: relative;
+  z-index: 1;
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Header Titles */
+.instabio-title-wrap {
+  margin: 47px 0 20px 0;
+  text-align: center;
+  width: 100%;
+}
+
+.instabio-title {
+  margin: 0;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 59px;
+  line-height: 1;
+  letter-spacing: 9.2px;
+  color: #FFFFFF;
+  text-shadow: 0px 0px 49px rgba(216, 213, 213, 0.96);
+}
+
+.instabio-subtitle-wrap {
+  margin: -22px 0 11px 0;
+  text-align: center;
+  font-family: 'Roboto', sans-serif;
+  font-size: 28px;
+  font-weight: 600;
+  color: #7A7A7A;
+  width: 100%;
+}
+
+.instabio-subtitle-wrap p {
+  margin: 0 0 14px 0;
+}
+
+.instabio-subtitle-highlight {
+  color: #339966;
+}
+
+/* Link Cards */
+.instabio-card {
+  width: 100%;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.instabio-card:last-child {
+  margin-bottom: 0;
+}
+
+.instabio-card a {
+  display: inline-block;
+  width: 100%;
+  text-decoration: none;
+}
+
+.instabio-card img {
+  width: 51%;
+  max-width: 100%;
+  height: auto;
+  display: inline-block;
+  vertical-align: middle;
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0px 4px 10px 0px rgba(255, 255, 255, 0.5);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.instabio-card a:hover img {
+  transform: translateY(-2px);
+  box-shadow: 0px 6px 16px 0px rgba(255, 255, 255, 0.65);
+}
+
+/* Bottom Footer Spacer Container (Matches Elementor e-con 34bffc7) */
+.instabio-bottom-spacer {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background-color: #000000;
+}
+
+.instabio-bottom-spacer::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: #000000;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* Tablet Breakpoint */
+@media (max-width: 1024px) {
+  .instabio-container {
+    max-width: 1024px;
+  }
+}
+
+/* Mobile Breakpoint */
+@media (max-width: 767px) {
+  .instabio-section {
+    background-position: top center;
+    background-size: cover;
+    padding: 14px 5px 5px 5px;
+  }
+
+  .instabio-overlay {
+    opacity: 0.83;
+  }
+
+  .instabio-container {
+    max-width: 767px;
+  }
+
+  .instabio-title-wrap {
+    margin: 34px 0 21px 0;
+  }
+
+  .instabio-title {
+    font-size: 24px;
+  }
+
+  .instabio-subtitle-wrap {
+    font-size: 17px;
+  }
+
+  .instabio-card {
+    margin: 0 0 20px 0;
+  }
+
+  .instabio-card img {
+    width: 100%;
+    border-radius: 9px;
+  }
+
+  .instabio-bottom-spacer {
+    min-height: 122px;
+    background-image: url('assets/img/Banner-01-Mobile.webp');
+    background-position: center;
+    background-size: cover;
+  }
+
+  .instabio-bottom-spacer::before {
+    opacity: 0.81;
+  }
+}
+

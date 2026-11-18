@@ -337,6 +337,36 @@ html, body {
   font-weight: 900;
 }
 
+.coupon-copy-bar.neres-theme {
+  background: linear-gradient(90deg, #0b3d28 0%, #146342 50%, #0b3d28 100%);
+  border: 1px solid rgba(212, 184, 114, 0.55);
+  box-shadow: 0 4px 14px rgba(20, 99, 66, 0.55);
+}
+
+.coupon-copy-bar.neres-theme:hover {
+  box-shadow: 0 6px 18px rgba(20, 99, 66, 0.8);
+}
+
+.coupon-copy-bar.neres-theme .coupon-code-pill {
+  background: #f5f2e8;
+  color: #092c1d;
+}
+
+.coupon-copy-bar.crown-theme {
+  background: linear-gradient(90deg, #1f1a10 0%, #3d3118 50%, #1f1a10 100%);
+  border: 1px solid rgba(235, 192, 92, 0.7);
+  box-shadow: 0 4px 14px rgba(212, 165, 58, 0.45);
+}
+
+.coupon-copy-bar.crown-theme:hover {
+  box-shadow: 0 6px 18px rgba(212, 165, 58, 0.75);
+}
+
+.coupon-copy-bar.crown-theme .coupon-code-pill {
+  background: #f5c85c;
+  color: #14110a;
+}
+
 /* Rodapé de Conformidade do Google Ads */
 .ads-compliance-footer {
   position: relative;

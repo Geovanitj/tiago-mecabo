@@ -108,7 +108,7 @@
           <span>Cupom <strong>MECABO</strong> ativo hoje: Até 15% OFF + Frete Grátis na Neres Brasil</span>
         </div>
 
-        <a id="card-partner-coupon" data-card="cupom_neres" data-partner="neres_brasil" data-coupon="MECABO"
+          id="card-partner-coupon" data-card="cupom_parceiro" data-partner="neres_brasil" data-coupon="MECABO"
           href="https://neresbrasil.com.br/" target="_blank" rel="noopener">
           <span class="sr-only">Cupom de Desconto Neres Brasil: MECABO - Até 15% OFF e Frete Grátis para todo o Brasil.
             Clique e aproveite no site oficial da Neres Brasil.</span>
@@ -248,19 +248,9 @@
           copyBtnText.innerHTML = "✅ CUPOM <span class='coupon-code-pill'>MECABO</span> COPIADO! ABRINDO NERES BRASIL...";
         }
 
-        // Dispara tanto o evento específico da Neres quanto o evento padrão de conversão de cupom no GTM
+        // Dispara o mesmo evento único de conversão de cupom para todas as páginas no GTM
         window.dataLayer.push({
-          event: "click_cupom_neres",
-          event_category: "conversion",
-          event_label: coupon,
-          partner_brand: "neres_brasil",
-          interaction_source: sourceType,
-          coupon_code: coupon,
-          destination_url: destUrl
-        });
-
-        window.dataLayer.push({
-          event: "click_cupom_growth",
+          event: "click_copiar_cupom",
           event_category: "conversion",
           event_label: coupon,
           partner_brand: "neres_brasil",

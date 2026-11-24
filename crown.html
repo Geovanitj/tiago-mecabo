@@ -108,7 +108,7 @@
           <span>Cupom <strong>MECABO</strong> verificado e ativo hoje na Crown Training</span>
         </div>
 
-        <a id="card-partner-coupon" data-card="cupom_crown" data-partner="crown_training" data-coupon="MECABO"
+          id="card-partner-coupon" data-card="cupom_parceiro" data-partner="crown_training" data-coupon="MECABO"
           href="https://www.crowntraining.com.br/?CUPOM=MECABO" target="_blank" rel="noopener">
           <span class="sr-only">Cupom de Desconto Crown Training: MECABO - Roupas de treino de alta performance com
             desconto. Clique e aproveite no site oficial da Crown Training.</span>
@@ -248,19 +248,9 @@
           copyBtnText.innerHTML = "✅ CUPOM <span class='coupon-code-pill'>MECABO</span> COPIADO! ABRINDO CROWN TRAINING...";
         }
 
-        // Dispara tanto o evento específico da Crown quanto o evento padrão de conversão de cupom no GTM
+        // Dispara o mesmo evento único de conversão de cupom para todas as páginas no GTM
         window.dataLayer.push({
-          event: "click_cupom_crown",
-          event_category: "conversion",
-          event_label: coupon,
-          partner_brand: "crown_training",
-          interaction_source: sourceType,
-          coupon_code: coupon,
-          destination_url: destUrl
-        });
-
-        window.dataLayer.push({
-          event: "click_cupom_growth",
+          event: "click_copiar_cupom",
           event_category: "conversion",
           event_label: coupon,
           partner_brand: "crown_training",

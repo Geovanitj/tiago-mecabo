@@ -6,6 +6,20 @@ const os = require('os');
 const PORT = process.env.PORT || 3000;
 const ROOT = __dirname;
 
+// Carrega .env local caso exista
+const envPath = path.join(ROOT, '.env');
+if (fs.existsSync(envPath)) {
+  const envContent = fs.readFileSync(envPath, 'utf-8');
+  envContent.split(/\r?\n/).forEach((line) => {
+    const match = line.match(/^\s*([\w.-]+)\s*=\s*(.*)?\s*$/);
+    if (match && !process.env[match[1]]) {
+      process.env[match[1]] = (match[2] || '').replace(/^['"]|['"]$/g, '').trim();
+    }
+  });
+}
+
+const GTM_ID = process.env.GTM_ID || '';
+
 const MIME_TYPES = {
   '.html': 'text/html; charset=utf-8',
   '.css': 'text/css; charset=utf-8',
@@ -45,7 +59,12 @@ const server = http.createServer((req, res) => {
     const ext = path.extname(filePath).toLowerCase();
     const contentType = MIME_TYPES[ext] || 'application/octet-stream';
     res.writeHead(200, { 'Content-Type': contentType });
-    res.end(content);
+    if (ext === '.html') {
+      const html = content.toString('utf-8').replace(/__GTM_ID__/g, GTM_ID);
+      res.end(html, 'utf-8');
+    } else {
+      res.end(content);
+    }
   });
 });
 

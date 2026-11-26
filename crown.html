@@ -234,178 +234,203 @@
         }, 4000);
       }
 
-      function triggerPartnerConversion(sourceType) {
-        var partnerCard = document.getElementById("card-partner-coupon");
-        var coupon = (partnerCard && partnerCard.getAttribute("data-coupon")) || "MECABO";
-        var destUrl = (partnerCard && partnerCard.href) || "https://www.crowntraining.com.br/?CUPOM=MECABO";
+        function triggerPartnerConversion(sourceType, onComplete) {
+          var partnerCard = document.getElementById("card-partner-coupon");
+          var coupon = (partnerCard && partnerCard.getAttribute("data-coupon")) || "MECABO";
+          var destUrl = (partnerCard && partnerCard.href) || "https://www.crowntraining.com.br/?CUPOM=MECABO";
 
-        copyCouponToClipboard(coupon);
-        showCouponToast();
+          copyCouponToClipboard(coupon);
+          showCouponToast();
 
-        var copyBtn = document.getElementById("btn-copy-coupon");
-        var copyBtnText = document.getElementById("btn-copy-text");
-        if (copyBtn && copyBtnText) {
-          copyBtn.classList.add("copied");
-          copyBtnText.innerHTML = "✅ CUPOM <span class='coupon-code-pill'>MECABO</span> COPIADO! ABRINDO CROWN TRAINING...";
+          var copyBtn = document.getElementById("btn-copy-coupon");
+          var copyBtnText = document.getElementById("btn-copy-text");
+          if (copyBtn && copyBtnText) {
+            copyBtn.classList.add("copied");
+            copyBtnText.innerHTML = "✅ CUPOM <span class='coupon-code-pill'>MECABO</span> COPIADO! ABRINDO CROWN TRAINING...";
+          }
+
+          var hasNavigated = false;
+          function done() {
+            if (hasNavigated) return;
+            hasNavigated = true;
+            if (typeof onComplete === "function") {
+              onComplete(destUrl);
+            }
+          }
+
+          // Fallback de segurança (700ms) caso o GTM esteja bloqueado por AdBlock
+          var fallbackTimer = setTimeout(done, 700);
+
+          // Dispara o mesmo evento único de conversão de cupom para todas as páginas no GTM
+          window.dataLayer.push({
+            event: "click_copiar_cupom",
+            event_category: "conversion",
+            event_label: coupon,
+            partner_brand: "crown_training",
+            interaction_source: sourceType,
+            coupon_code: coupon,
+          destination_url: destUrl,
+            eventTimeout: 700,
+            eventCallback: function () {
+              // Aguarda 550ms para garantir que o beacon HTTP do Google Ads (AW-17875421800) foi enviado antes da troca de aba
+              setTimeout(function () {
+                clearTimeout(fallbackTimer);
+                done();
+              }, 550);
+            }
+          });
         }
 
-        // Dispara o mesmo evento único de conversão de cupom para todas as páginas no GTM
-        window.dataLayer.push({
-          event: "click_copiar_cupom",
-          event_category: "conversion",
-          event_label: coupon,
-          partner_brand: "crown_training",
-          interaction_source: sourceType,
-          coupon_code: coupon,
-          destination_url: destUrl
-        });
-      }
+        function openDestinationSafely(destUrl) {
+          var newWin = window.open(destUrl, "_blank", "noopener");
+          if (!newWin || newWin.closed || typeof newWin.closed === "undefined") {
+            window.location.href = destUrl;
+          }
+        }
 
-      var partnerCard = document.getElementById("card-partner-coupon");
-      if (partnerCard) {
-        partnerCard.addEventListener("click", function () {
-          triggerPartnerConversion("banner_image");
-        });
-      }
+        var partnerCard = document.getElementById("card-partner-coupon");
+        if (partnerCard) {
+            partnerCard.addEventListener("click", function (e) {
+              e.preventDefault();
+              triggerPartnerConversion("banner_image", openDestinationSafely);
+            });
+          }
 
       var copyBtn = document.getElementById("btn-copy-coupon");
-      if (copyBtn) {
-        copyBtn.addEventListener("click", function () {
-          triggerPartnerConversion("copy_button");
-          var destUrl = (partnerCard && partnerCard.href) || "https://www.crowntraining.com.br/?CUPOM=MECABO";
-          setTimeout(function () {
-            window.open(destUrl, "_blank", "noopener");
-          }, 350);
-        });
-      }
+          if (copyBtn) {
+              copyBtn.addEventListener("click", function (e) {
+                e.preventDefault();
+                triggerPartnerConversion("copy_button", openDestinationSafely);
+              });
+            }
 
       document.querySelectorAll(".instabio-card a[data-card]").forEach(function (link) {
-        link.addEventListener("click", function () {
-          var cardName = link.getAttribute("data-card");
-          window.dataLayer.push({
-            event: "instabio_card_click",
-            card_name: cardName,
-            destination_url: link.href
-          });
-        });
-      });
-
-      // Repasse inteligente de UTMs e parâmetros do Google Ads (gclid, wbraid, gbraid)
-      function getTrackingParams() {
-        var params = new URLSearchParams(window.location.search);
-        var trackingParams = {};
-        var allowedParams = [
-          "utm_source",
-          "utm_medium",
-          "utm_campaign",
-          "utm_content",
-          "utm_term",
-          "utm_id",
-          "gclid",
-          "wbraid",
-          "gbraid",
-          "fbclid",
-          "ad_id"
-        ];
-
-        allowedParams.forEach(function (param) {
-          if (params.has(param)) {
-            var key = param === "ad_id" ? "sck" : param;
-            trackingParams[key] = params.get(param);
-          }
-        });
-
-        return trackingParams;
-      }
-
-      function getEventId() {
-        try {
-          var stapeData = localStorage.getItem("stape") || sessionStorage.getItem("stape");
-          if (stapeData) {
-            var parsed = JSON.parse(stapeData);
-            if (parsed && parsed.event_id) return parsed.event_id;
-          }
-        } catch (e) { }
-
-        var cookies = document.cookie.split("; ");
-        for (var i = 0; i < cookies.length; i++) {
-          var parts = cookies[i].split("=");
-          if (parts[0] === "event_id") return parts[1];
-        }
-        return null;
-      }
-
-      function injectTrackingToLinks() {
-        var trackingParams = getTrackingParams();
-        var eventId = getEventId();
-
-        if (eventId) {
-          if (trackingParams["utm_content"]) {
-            trackingParams["utm_content"] += ";_;" + eventId;
-          } else {
-            trackingParams["utm_content"] = eventId;
-          }
-        }
-
-        if (Object.keys(trackingParams).length === 0) return;
-
-        document.querySelectorAll(".instabio-card a[href]").forEach(function (link) {
-          try {
-            var url = new URL(link.href);
-            if (url.hostname.includes("whatsapp.com") || url.hostname.includes("youtube.com")) {
-              return;
-            }
-            var searchParams = new URLSearchParams(url.search);
-            Object.entries(trackingParams).forEach(function (entry) {
-              searchParams.set(entry[0], entry[1]);
+              link.addEventListener("click", function () {
+                var cardName = link.getAttribute("data-card");
+                window.dataLayer.push({
+                  event: "instabio_card_click",
+                  card_name: cardName,
+                  destination_url: link.href
+                });
+              });
             });
-            url.search = searchParams.toString();
-            link.href = url.toString();
-          } catch (e) { }
-        });
-      }
 
-      injectTrackingToLinks();
+            // Repasse inteligente de UTMs e parâmetros do Google Ads (gclid, wbraid, gbraid)
+            function getTrackingParams() {
+              var params = new URLSearchParams(window.location.search);
+              var trackingParams = {};
+              var allowedParams = [
+                "utm_source",
+                "utm_medium",
+                "utm_campaign",
+                "utm_content",
+                "utm_term",
+                "utm_id",
+                "gclid",
+                "wbraid",
+                "gbraid",
+                "fbclid",
+                "ad_id"
+              ];
 
-      // Modal de Política de Privacidade / Termos de Uso
-      var modalBackdrop = document.getElementById("legal-modal-backdrop");
-      var modalTitle = document.getElementById("legal-modal-title");
-      var modalBody = document.getElementById("legal-modal-body");
-      var modalClose = document.getElementById("legal-modal-close");
+              allowedParams.forEach(function (param) {
+                if (params.has(param)) {
+                  var key = param === "ad_id" ? "sck" : param;
+                  trackingParams[key] = params.get(param);
+                }
+              });
 
-      var legalTexts = {
-        privacy: {
-          title: "Política de Privacidade",
-          body: "<p>Esta página respeita a sua privacidade e atua em conformidade com a Lei Geral de Proteção de Dados (LGPD - Lei nº 13.709/2018).</p><p>Utilizamos cookies e ferramentas de análise (como Google Tag Manager e Google Ads) exclusivamente para mensurar o desempenho de campanhas publicitárias e melhorar a experiência de navegação. Nenhum dado pessoal sensível é coletado sem o seu consentimento.</p>"
-        },
-        terms: {
-          title: "Termos de Uso",
-          body: "<p>Esta página reúne links oficiais de programas de treinamento de corrida do treinador Tiago Mecabô e o cupom de desconto parceiro MECABO para compras no site oficial da Crown Training (crowntraining.com.br).</p><p>As condições comerciais, preços, prazos de entrega e aplicação de descontos são de responsabilidade exclusiva da loja oficial de destino.</p>"
-        }
-      };
+              return trackingParams;
+            }
 
-      document.querySelectorAll("[data-modal]").forEach(function (btn) {
-        btn.addEventListener("click", function () {
-          var type = btn.getAttribute("data-modal");
-          if (legalTexts[type] && modalBackdrop) {
-            modalTitle.textContent = legalTexts[type].title;
-            modalBody.innerHTML = legalTexts[type].body;
-            modalBackdrop.classList.add("open");
-          }
-        });
-      });
+            function getEventId() {
+              try {
+                var stapeData = localStorage.getItem("stape") || sessionStorage.getItem("stape");
+                if (stapeData) {
+                  var parsed = JSON.parse(stapeData);
+                  if (parsed && parsed.event_id) return parsed.event_id;
+                }
+              } catch (e) { }
 
-      if (modalClose && modalBackdrop) {
-        modalClose.addEventListener("click", function () {
-          modalBackdrop.classList.remove("open");
-        });
-        modalBackdrop.addEventListener("click", function (e) {
-          if (e.target === modalBackdrop) {
-            modalBackdrop.classList.remove("open");
-          }
-        });
-      }
-    });
+              var cookies = document.cookie.split("; ");
+              for (var i = 0; i < cookies.length; i++) {
+                var parts = cookies[i].split("=");
+                if (parts[0] === "event_id") return parts[1];
+              }
+              return null;
+            }
+
+            function injectTrackingToLinks() {
+              var trackingParams = getTrackingParams();
+              var eventId = getEventId();
+
+              if (eventId) {
+                if (trackingParams["utm_content"]) {
+                  trackingParams["utm_content"] += ";_;" + eventId;
+                } else {
+                  trackingParams["utm_content"] = eventId;
+                }
+              }
+
+              if (Object.keys(trackingParams).length === 0) return;
+
+              document.querySelectorAll(".instabio-card a[href]").forEach(function (link) {
+                try {
+                  var url = new URL(link.href);
+                  if (url.hostname.includes("whatsapp.com") || url.hostname.includes("youtube.com")) {
+                    return;
+                  }
+                  var searchParams = new URLSearchParams(url.search);
+                  Object.entries(trackingParams).forEach(function (entry) {
+                    searchParams.set(entry[0], entry[1]);
+                  });
+                  url.search = searchParams.toString();
+                  link.href = url.toString();
+                } catch (e) { }
+              });
+            }
+
+            injectTrackingToLinks();
+
+            // Modal de Política de Privacidade / Termos de Uso
+            var modalBackdrop = document.getElementById("legal-modal-backdrop");
+            var modalTitle = document.getElementById("legal-modal-title");
+            var modalBody = document.getElementById("legal-modal-body");
+            var modalClose = document.getElementById("legal-modal-close");
+
+            var legalTexts = {
+              privacy: {
+                title: "Política de Privacidade",
+                body: "<p>Esta página respeita a sua privacidade e atua em conformidade com a Lei Geral de Proteção de Dados (LGPD - Lei nº 13.709/2018).</p><p>Utilizamos cookies e ferramentas de análise (como Google Tag Manager e Google Ads) exclusivamente para mensurar o desempenho de campanhas publicitárias e melhorar a experiência de navegação. Nenhum dado pessoal sensível é coletado sem o seu consentimento.</p>"
+              },
+              terms: {
+                title: "Termos de Uso",
+                body: "<p>Esta página reúne links oficiais de programas de treinamento de corrida do treinador Tiago Mecabô e o cupom de desconto parceiro MECABO para compras no site oficial da Crown Training (crowntraining.com.br).</p><p>As condições comerciais, preços, prazos de entrega e aplicação de descontos são de responsabilidade exclusiva da loja oficial de destino.</p>"
+              }
+            };
+
+            document.querySelectorAll("[data-modal]").forEach(function (btn) {
+              btn.addEventListener("click", function () {
+                var type = btn.getAttribute("data-modal");
+                if (legalTexts[type] && modalBackdrop) {
+                  modalTitle.textContent = legalTexts[type].title;
+                  modalBody.innerHTML = legalTexts[type].body;
+                  modalBackdrop.classList.add("open");
+                }
+              });
+            });
+
+            if (modalClose && modalBackdrop) {
+              modalClose.addEventListener("click", function () {
+                modalBackdrop.classList.remove("open");
+              });
+              modalBackdrop.addEventListener("click", function (e) {
+                if (e.target === modalBackdrop) {
+                  modalBackdrop.classList.remove("open");
+                }
+              });
+            }
+          });
   </script>
 </body>
 

@@ -282,11 +282,7 @@
         }
 
         function openDestinationSafely(destUrl) {
-          var newWin = window.open(destUrl, "_blank", "noopener");
-          // No iOS/Safari mobile, window.open assíncrono pode retornar null; faz fallback para abrir na janela após o hit do Ads ter sido enviado
-          if (!newWin || newWin.closed || typeof newWin.closed === "undefined") {
-            window.location.href = destUrl;
-          }
+          window.open(destUrl, "_blank", "noopener");
         }
 
         var partnerCard = document.getElementById("card-partner-coupon");
